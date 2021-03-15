@@ -1,0 +1,295 @@
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include<QProcess>
+#include<QDebug>
+#include<QFile>
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+
+    ui->brightness_Value->setStyleSheet("border: 1px solid black");
+
+    //Read brightness value for startup
+    QFile brightness_current("/sys/devices/soc0/backlight/backlight/backlight/brightness");
+    brightness_current.open(QIODevice::ReadOnly);
+    char level[1];
+    brightness_current.read(level,1);
+    int backlight_Flag= atoi(level);
+    qDebug() << "current brightness in int " << backlight_Flag;
+    brightness_current.close();
+    ui->brightness_label->setVisible(false);
+    QString bf=QString::number(backlight_Flag);
+    ui->brightness_label->setText(bf);
+
+    // display brightness percentage on startup
+    //70 from debug observation on startup
+    if(backlight_Flag==7 || backlight_Flag==70 )
+    {
+     ui->brightness_Value->setText("100");
+     ui->Btn_Bright->setEnabled(false);
+    }
+    if(backlight_Flag==6)
+    {
+     ui->brightness_Value->setText("90");
+    }
+    if(backlight_Flag==5)
+    {
+     ui->brightness_Value->setText("80");
+    }
+    if(backlight_Flag==4)
+    {
+     ui->brightness_Value->setText("70");
+    }
+    if(backlight_Flag==3)
+    {
+     ui->brightness_Value->setText("60");
+    }
+    if(backlight_Flag==2)
+    {
+     ui->brightness_Value->setText("50");
+    }
+    if(backlight_Flag==1)
+    {
+     ui->brightness_Value->setText("25");
+    }
+    if(backlight_Flag==0)
+    {
+     ui->brightness_Value->setText("0");
+    }
+
+
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+
+void MainWindow::on_pushButton_pressed()
+{
+
+}
+
+void MainWindow::on_pushButton_released()
+{
+   QApplication::quit();
+}
+
+void MainWindow::on_Btn_Dark_pressed()
+{
+    //Read brightness value to feed to brightness flag
+    QFile brightness_current("/sys/devices/soc0/backlight/backlight/backlight/brightness");
+    brightness_current.open(QIODevice::ReadOnly);
+    char level[1];
+    brightness_current.read(level,1);
+    int backlight_Flag= atoi(level);
+    qDebug() << "current brightness in int " << backlight_Flag;
+    brightness_current.close();
+    QString bf=QString::number(backlight_Flag);
+    ui->brightness_label->setText(bf);
+
+}
+
+void MainWindow::on_Btn_Dark_released()
+{
+    QString bv= ui->brightness_label->text();
+    int backlight_Flag=bv.toInt();
+    //FROM QPROCESS
+    if(backlight_Flag==7)
+    {
+    ui->Btn_Bright->setEnabled(true);
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight6.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag--;
+    ui->brightness_Value->setText("90");
+    qDebug() <<  backlight_Flag;
+     }
+    else if(backlight_Flag==6)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight5.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag--;
+    ui->brightness_Value->setText("80");
+    qDebug() <<  backlight_Flag;
+    }
+    else if(backlight_Flag==5)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight4.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag--;
+    ui->brightness_Value->setText("70");
+    qDebug() <<  backlight_Flag;
+    }
+    else if(backlight_Flag==4)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight3.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag--;
+    ui->brightness_Value->setText("60");
+    qDebug() <<  backlight_Flag;
+    }
+    else if(backlight_Flag==3)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight2.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag--;
+    ui->brightness_Value->setText("50");
+    qDebug() <<  backlight_Flag;
+    }
+    else if(backlight_Flag==2)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight1.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag--;
+    ui->brightness_Value->setText("25");
+    qDebug() <<  backlight_Flag;
+    }
+    else if(backlight_Flag==1)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight0.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag--;
+    ui->brightness_Value->setText("0");
+    qDebug() <<  backlight_Flag;
+    ui->Btn_Dark->setEnabled(false);
+    }
+}
+
+void MainWindow::on_Btn_Bright_pressed()
+{
+    //Read brightness value to feed to brightness flag
+    QFile brightness_current("/sys/devices/soc0/backlight/backlight/backlight/brightness");
+    brightness_current.open(QIODevice::ReadOnly);
+    char level[1];
+    brightness_current.read(level,1);
+    int backlight_Flag= atoi(level);
+    qDebug() << "current brightness in int " << backlight_Flag;
+    brightness_current.close();
+    QString bf=QString::number(backlight_Flag);
+    ui->brightness_label->setText(bf);
+}
+
+void MainWindow::on_Btn_Bright_released()
+{
+    QString bv= ui->brightness_label->text();
+    int backlight_Flag=bv.toInt();
+    //FROM QPROCESS
+    if(backlight_Flag==0)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight1.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag++;
+    ui->brightness_Value->setText("25");
+    qDebug() <<  backlight_Flag;
+    ui->Btn_Dark->setEnabled(true);
+     }
+    else if(backlight_Flag==1)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight2.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag++;
+    ui->brightness_Value->setText("50");
+    qDebug() <<  backlight_Flag;
+    }
+    else if(backlight_Flag==2)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight3.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag++;
+    ui->brightness_Value->setText("60");
+    qDebug() <<  backlight_Flag;
+    }
+    else if(backlight_Flag==3)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight4.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag++;
+    ui->brightness_Value->setText("70");
+    qDebug() <<  backlight_Flag;
+    }
+    else if(backlight_Flag==4)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight5.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag++;
+    ui->brightness_Value->setText("80");
+    qDebug() <<  backlight_Flag;
+    }
+    else if(backlight_Flag==5)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight6.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag++;
+    ui->brightness_Value->setText("90");
+    qDebug() <<  backlight_Flag;
+    }
+    else if(backlight_Flag==6)
+    {
+    QProcess OProcess_Backlight;
+    OProcess_Backlight.start("/opt/backlight7.sh");
+    OProcess_Backlight.waitForFinished();
+    backlight_Flag++;
+    ui->brightness_Value->setText("100");
+    qDebug() <<  backlight_Flag;
+    ui->Btn_Bright->setEnabled(false);
+    }
+
+
+}
+
+void MainWindow::on_titlebar_Close_pressed()
+{
+
+}
+
+void MainWindow::on_titlebar_Close_released()
+{
+    QApplication::quit();
+}
+
+
+
+void MainWindow::on_checkBox_Buzzer_stateChanged(int arg1)
+{
+    if(ui->checkBox_Buzzer->isChecked())
+    {
+        qDebug()<< "checkbox is checked";
+    }
+    else
+    {
+qDebug()<< "checkbox is un  checked";
+    }
+
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *ev)
+   {
+    if(ui->checkBox_Buzzer->isChecked())
+    {
+        qDebug()<< "checkbox is checked from touch event";
+        QProcess OProcess_Buzzer;
+        OProcess_Buzzer.start("/opt/buzzer500.sh");
+        OProcess_Buzzer.waitForFinished();
+    }
+    else
+    {
+        qDebug()<< "checkbox is UNchecked from touch event";
+    }
+   }
